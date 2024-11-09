@@ -1,29 +1,10 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { inMemoryUsersRepository } from '../infrastructure/persistence/in-memory-users-repository'
   import encrypt from '../utils/encrypt'
+  import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
+  import LogToConsoleEmailSender from '../infrastructure/email/log-to-console-email-sender'
 
-  const emailSender = {
-    sendEmail: ({
-      from,
-      to,
-      subject,
-      body,
-    }: {
-      from: string
-      to: string
-      subject: string
-      body: string
-    }) => {
-      console.log('Sending email')
-      console.log('- From: ', from)
-      console.log('- To: ', to)
-      console.log('- Subject: ', subject)
-      console.log('- Body: ', body)
-      console.log('Email sent')
-    },
-  }
-
+  const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const nameRef = ref('')
   const emailRef = ref('')
   const passwordRef = ref('')
@@ -59,6 +40,7 @@
       })
 
       // send an email to confirm email
+      const emailSender = new LogToConsoleEmailSender()
       emailSender.sendEmail({
         from: 'no-reply@tinderella.com',
         to: emailRef.value,

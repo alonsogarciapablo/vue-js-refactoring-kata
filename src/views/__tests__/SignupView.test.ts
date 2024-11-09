@@ -1,7 +1,9 @@
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
 import SignupView from '../SignupView.vue'
-import { inMemoryUsersRepository } from '../../infrastructure/persistence/in-memory-users-repository'
+import InMemoryUsersRepository from '../../infrastructure/persistence/in-memory-users-repository'
+
+const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
 
 describe('SignupView', () => {
   let wrapper, name, email, password, passwordConfirmation
