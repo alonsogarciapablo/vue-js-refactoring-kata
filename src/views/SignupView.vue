@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import { inMemoryUsersRepository } from '../infrastructure/persistence/in-memory-users-repository'
+  import encrypt from '../utils/encrypt'
 
   const emailSender = {
     sendEmail: ({
@@ -66,10 +67,6 @@
       })
 
       isUserCreated.value = true
-    }
-
-    function encrypt(password: string): string {
-      return btoa(password)
     }
   }
 </script>
