@@ -1,7 +1,7 @@
 export default class InMemoryUsersRepository {
-  private constructor() {}
+  private users: Array<{ name: string; email: string; password: string }> = []
 
-  users: Array<{ name: string; email: string; password: string }> = []
+  private constructor() {}
 
   add({ name, email, password }: { name: string; email: string; password: string }) {
     this.users.push({ name, email, password })
