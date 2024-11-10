@@ -86,6 +86,17 @@ describe('SignupView', () => {
         "Oooops! Check these errors:Passwords don't match",
       )
     })
+
+    it('should show multiple errors', async () => {
+      name.setValue('')
+      email.setValue('')
+
+      await wrapper.get('form').trigger('submit')
+
+      expect(wrapper.get('.errors').text()).toEqual(
+        'Oooops! Check these errors:Name cannot be blankEmail cannot be blank',
+      )
+    })
   })
 
   describe('when the form is valid', () => {
