@@ -6,7 +6,7 @@ import InMemoryUsersRepository from '../../infrastructure/persistence/in-memory-
 const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
 
 describe('SignupView', () => {
-  let wrapper, name, email, password, passwordConfirmation
+  let wrapper, name, email, birthDate, password, passwordConfirmation
 
   beforeEach(() => {
     inMemoryUsersRepository.deleteAll()
@@ -14,6 +14,7 @@ describe('SignupView', () => {
 
     name = wrapper.get('[data-test="name"]')
     email = wrapper.get('[data-test="email"]')
+    birthDate = wrapper.get('[data-test="birthday"]')
     password = wrapper.get('[data-test="password"]')
     passwordConfirmation = wrapper.get('[data-test="passwordConfirmation"]')
   })
@@ -27,6 +28,7 @@ describe('SignupView', () => {
     beforeEach(async () => {
       name.setValue('Chuck')
       email.setValue('chuck@norris.com')
+      birthDate.setValue('1981-11-12')
       password.setValue('12341234')
       passwordConfirmation.setValue('12341234')
     })
@@ -55,6 +57,7 @@ describe('SignupView', () => {
       inMemoryUsersRepository.add({
         name: 'Chuck',
         email: 'chuck@norris.com',
+        birthDate: '1981-11-12',
         encryptedPassword: '23243563',
       })
 
@@ -62,6 +65,27 @@ describe('SignupView', () => {
 
       expect(wrapper.get('.errors').text()).toEqual(
         'Oooops! Check these errors:Email has already been used',
+      )
+    })
+
+    it('should show an error if the birthday is empty', async () => {
+      birthDate.setValue('')
+
+      await wrapper.get('form').trigger('submit')
+
+      expect(wrapper.get('.errors').text()).toEqual(
+        'Oooops! Check these errors:Birthday cannot be blank',
+      )
+    })
+
+    // FIXME: This test will fail in the future. We should mock the system date
+    it('should show an error if the user is not older than 18', async () => {
+      birthDate.setValue('2020-10-10')
+
+      await wrapper.get('form').trigger('submit')
+
+      expect(wrapper.get('.errors').text()).toEqual(
+        'Oooops! Check these errors:You must be older than 18',
       )
     })
 
@@ -107,11 +131,13 @@ describe('SignupView', () => {
 
       const name = wrapper.get('[data-test="name"]')
       const email = wrapper.get('[data-test="email"]')
+      const birthDate = wrapper.get('[data-test="birthday"]')
       const password = wrapper.get('[data-test="password"]')
       const passwordConfirmation = wrapper.get('[data-test="passwordConfirmation"]')
 
       name.setValue('Chuck')
       email.setValue('chuck@norris.com')
+      birthDate.setValue('1981-11-12')
       password.setValue('12341234')
       passwordConfirmation.setValue('12341234')
 
@@ -134,6 +160,7 @@ describe('SignupView', () => {
       expect(inMemoryUsersRepository.findByEmail('chuck@norris.com')).toEqual({
         email: 'chuck@norris.com',
         name: 'Chuck',
+        birthDate: '1981-11-12',
         encryptedPassword: 'MTIzNDEyMzQ=',
       })
     })

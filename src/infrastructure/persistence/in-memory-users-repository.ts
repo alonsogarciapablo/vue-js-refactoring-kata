@@ -1,18 +1,25 @@
 export default class InMemoryUsersRepository {
-  private users: Array<{ name: string; email: string; encryptedPassword: string }> = []
+  private users: Array<{
+    name: string
+    email: string
+    birthDate: string
+    encryptedPassword: string
+  }> = []
 
   private constructor() {}
 
   add({
     name,
     email,
+    birthDate,
     encryptedPassword,
   }: {
     name: string
     email: string
+    birthDate: string
     encryptedPassword: string
   }) {
-    this.users.push({ name, email, encryptedPassword })
+    this.users.push({ name, email, birthDate, encryptedPassword })
   }
 
   deleteAll() {

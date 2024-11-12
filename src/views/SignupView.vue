@@ -7,6 +7,7 @@
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const nameRef = ref('')
   const emailRef = ref('')
+  const birthDateRef = ref('')
   const passwordRef = ref('')
   const passwordConfirmationRef = ref('')
   const isUserCreatedRef = ref(false)
@@ -20,6 +21,12 @@
     }
     if (!emailRef.value) {
       errorsRef.value.push('Email cannot be blank')
+    }
+    if (!birthDateRef.value) {
+      errorsRef.value.push('Birthday cannot be blank')
+    }
+    if (birthDateRef.value && calculateAge(birthDateRef.value) < 18) {
+      errorsRef.value.push('You must be older than 18')
     }
     if (inMemoryUsersRepository.findByEmail(emailRef.value)) {
       errorsRef.value.push('Email has already been used')
@@ -36,6 +43,7 @@
       inMemoryUsersRepository.add({
         name: nameRef.value,
         email: emailRef.value,
+        birthDate: birthDateRef.value,
         encryptedPassword: encrypt(passwordRef.value),
       })
 
@@ -50,6 +58,19 @@
 
       isUserCreatedRef.value = true
     }
+  }
+
+  function calculateAge(birthDate: string) {
+    const today = new Date()
+    const birth = new Date(birthDate)
+    let age = today.getFullYear() - birth.getFullYear()
+    const monthDifference = today.getMonth() - birth.getMonth()
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
+      age--
+    }
+
+    return age
   }
 </script>
 
@@ -75,6 +96,10 @@
       <label>
         Email
         <input type="email" v-model="emailRef" data-test="email" />
+      </label>
+      <label>
+        Birthdate
+        <input type="date" v-model="birthDateRef" data-test="birthday" />
       </label>
       <label>
         Password
