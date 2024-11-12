@@ -134,7 +134,7 @@ describe('SignupView', () => {
       expect(inMemoryUsersRepository.findByEmail('chuck@norris.com')).toEqual({
         email: 'chuck@norris.com',
         name: 'Chuck',
-        password: 'MTIzNDEyMzQ=',
+        encryptedPassword: 'MTIzNDEyMzQ=',
       })
     })
   })

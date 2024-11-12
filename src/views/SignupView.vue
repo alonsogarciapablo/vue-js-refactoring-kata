@@ -36,7 +36,7 @@
       inMemoryUsersRepository.add({
         name: nameRef.value,
         email: emailRef.value,
-        password: encrypt(passwordRef.value),
+        encryptedPassword: encrypt(passwordRef.value),
       })
 
       // send an email to confirm email
