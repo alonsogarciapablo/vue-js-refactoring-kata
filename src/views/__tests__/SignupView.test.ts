@@ -55,7 +55,7 @@ describe('SignupView', () => {
       inMemoryUsersRepository.add({
         name: 'Chuck',
         email: 'chuck@norris.com',
-        password: '23243563',
+        encryptedPassword: '23243563',
       })
 
       await wrapper.get('form').trigger('submit')
@@ -134,7 +134,7 @@ describe('SignupView', () => {
       expect(inMemoryUsersRepository.findByEmail('chuck@norris.com')).toEqual({
         email: 'chuck@norris.com',
         name: 'Chuck',
-        password: 'MTIzNDEyMzQ=',
+        encryptedPassword: 'MTIzNDEyMzQ=',
       })
     })
   })
