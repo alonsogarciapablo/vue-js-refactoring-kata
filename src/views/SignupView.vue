@@ -1,10 +1,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import encrypt from '../utils/encrypt'
-  import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
-  import LogToConsoleEmailSender from '../infrastructure/email/log-to-console-email-sender'
+  import RegisterUser from '../application/register-user'
 
-  const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const nameRef = ref('')
   const emailRef = ref('')
   const passwordRef = ref('')
@@ -13,43 +10,15 @@
   const errorsRef = ref<Array<string>>([])
 
   function submit() {
-    errorsRef.value = []
+    const { errors } = new RegisterUser().execute(
+      nameRef.value,
+      emailRef.value,
+      passwordRef.value,
+      passwordConfirmationRef.value,
+    )
 
-    if (!nameRef.value) {
-      errorsRef.value.push('Name cannot be blank')
-    }
-    if (!emailRef.value) {
-      errorsRef.value.push('Email cannot be blank')
-    }
-    if (inMemoryUsersRepository.findByEmail(emailRef.value)) {
-      errorsRef.value.push('Email has already been used')
-    }
-    if (passwordRef.value.length < 8) {
-      errorsRef.value.push('Password must have 8 digits')
-    }
-    if (passwordRef.value !== passwordConfirmationRef.value) {
-      errorsRef.value.push("Passwords don't match")
-    }
-
-    if (errorsRef.value.length === 0) {
-      // persist user
-      inMemoryUsersRepository.add({
-        name: nameRef.value,
-        email: emailRef.value,
-        password: encrypt(passwordRef.value),
-      })
-
-      // send an email to confirm email
-      const emailSender = new LogToConsoleEmailSender()
-      emailSender.sendEmail({
-        from: 'no-reply@tinderella.com',
-        to: emailRef.value,
-        subject: 'Please validate your email',
-        body: `Click here to validate your email: <a href="https://tinderella.com/validate?email=${emailRef.value}">validate</a>`,
-      })
-
-      isUserCreatedRef.value = true
-    }
+    isUserCreatedRef.value = errors.length === 0
+    errorsRef.value = errors
   }
 </script>
 
