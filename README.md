@@ -6,7 +6,7 @@
 
 1. Checkout the project
 
-```
+```bash
 git clone https://github.com/alonsogarciapablo/vue-js-refactoring-kata.git
 
 ```
