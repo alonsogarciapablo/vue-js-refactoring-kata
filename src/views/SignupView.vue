@@ -4,57 +4,57 @@
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
 
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
-  const nameRef = ref('')
-  const emailRef = ref('')
-  const birthDateRef = ref('')
-  const passwordRef = ref('')
-  const passwordConfirmationRef = ref('')
-  const isUserCreatedRef = ref(false)
-  const errorsRef = ref<Array<string>>([])
+  const name = ref('')
+  const email = ref('')
+  const birthDate = ref('')
+  const password = ref('')
+  const passwordConfirmation = ref('')
+  const isUserCreated = ref(false)
+  const errors = ref<Array<string>>([])
 
   function submit() {
-    errorsRef.value = []
+    errors.value = []
 
-    if (!nameRef.value) {
-      errorsRef.value.push('Name cannot be blank')
+    if (!name.value) {
+      errors.value.push('Name cannot be blank')
     }
-    if (!emailRef.value) {
-      errorsRef.value.push('Email cannot be blank')
+    if (!email.value) {
+      errors.value.push('Email cannot be blank')
     }
-    if (!birthDateRef.value) {
-      errorsRef.value.push('Birthday cannot be blank')
+    if (!birthDate.value) {
+      errors.value.push('Birthday cannot be blank')
     }
-    if (birthDateRef.value && calculateAge(birthDateRef.value) < 18) {
-      errorsRef.value.push('You must be older than 18')
+    if (birthDate.value && calculateAge(birthDate.value) < 18) {
+      errors.value.push('You must be older than 18')
     }
-    if (inMemoryUsersRepository.findByEmail(emailRef.value)) {
-      errorsRef.value.push('Email has already been used')
+    if (inMemoryUsersRepository.findByEmail(email.value)) {
+      errors.value.push('Email has already been used')
     }
-    if (passwordRef.value.length < 8) {
-      errorsRef.value.push('Password must have 8 digits')
+    if (password.value.length < 8) {
+      errors.value.push('Password must have 8 digits')
     }
-    if (passwordRef.value !== passwordConfirmationRef.value) {
-      errorsRef.value.push("Passwords don't match")
+    if (password.value !== passwordConfirmation.value) {
+      errors.value.push("Passwords don't match")
     }
 
-    if (errorsRef.value.length === 0) {
+    if (errors.value.length === 0) {
       // persist user
       inMemoryUsersRepository.add({
-        name: nameRef.value,
-        email: emailRef.value,
-        birthDate: birthDateRef.value,
-        encryptedPassword: encrypt(passwordRef.value),
+        name: name.value,
+        email: email.value,
+        birthDate: birthDate.value,
+        encryptedPassword: encrypt(password.value),
       })
 
       // send a confirmation email to the user
       sendEmail({
         from: 'no-reply@tinderella.com',
-        to: emailRef.value,
+        to: email.value,
         subject: 'Please validate your email',
-        body: `Click here to validate your email: <a href="https://tinderella.com/validate?email=${emailRef.value}">validate</a>`,
+        body: `Click here to validate your email: <a href="https://tinderella.com/validate?email=${email.value}">validate</a>`,
       })
 
-      isUserCreatedRef.value = true
+      isUserCreated.value = true
     }
   }
 
@@ -93,38 +93,38 @@
 
 <template>
   <h2>Sign up</h2>
-  <template v-if="isUserCreatedRef">
-    <p>Please check your email to finish the signup process.</p>
-    <button @click="isUserCreatedRef = false">Restart</button>
+  <template v-if="isUserCreated">
+    <p>We sent you an email to {{ email }} to complete the registration process.</p>
+    <button @click="isUserCreated = false">Restart</button>
   </template>
   <template v-else>
     <p>We promise you'll find the love of you life here.</p>
-    <div v-if="errorsRef.length" class="errors">
+    <div v-if="errors.length" class="errors">
       <p>Oooops! Check these errors:</p>
       <ul>
-        <li v-for="error in errorsRef" :key="error">{{ error }}</li>
+        <li v-for="error in errors" :key="error">{{ error }}</li>
       </ul>
     </div>
     <form @submit.prevent="submit">
       <label>
         Name
-        <input type="text" v-model="nameRef" data-test="name" />
+        <input type="text" v-model="name" data-test="name" />
       </label>
       <label>
         Email
-        <input type="email" v-model="emailRef" data-test="email" />
+        <input type="email" v-model="email" data-test="email" />
       </label>
       <label>
         Birthdate
-        <input type="date" v-model="birthDateRef" data-test="birthday" />
+        <input type="date" v-model="birthDate" data-test="birthday" />
       </label>
       <label>
         Password
-        <input type="password" v-model="passwordRef" data-test="password" />
+        <input type="password" v-model="password" data-test="password" />
       </label>
       <label>
         Password confirmation
-        <input type="password" v-model="passwordConfirmationRef" data-test="passwordConfirmation" />
+        <input type="password" v-model="passwordConfirmation" data-test="passwordConfirmation" />
       </label>
       <button type="submit" data-test="submit">💖 Sign up 💖</button>
     </form>

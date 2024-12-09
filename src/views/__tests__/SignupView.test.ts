@@ -153,7 +153,9 @@ describe('SignupView', () => {
     })
 
     it('should show a confirmation message', () => {
-      expect(wrapper.html()).toContain('Please check your email to finish the signup process')
+      expect(wrapper.html()).toContain(
+        'We sent you an email to chuck@norris.com to complete the registration process',
+      )
     })
 
     it('should create a user with an encripted password', async () => {
