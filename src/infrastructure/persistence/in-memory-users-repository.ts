@@ -1,6 +1,7 @@
 import type User from '../../domain/models/user'
+import type UsersRepository from '../../domain/repositories/users-repository'
 
-export default class InMemoryUsersRepository {
+export default class InMemoryUsersRepository implements UsersRepository {
   private users: Array<User> = []
 
   private constructor() {}

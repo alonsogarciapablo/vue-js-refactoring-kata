@@ -4,7 +4,6 @@
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
   import UserFactory from '../domain/models/user-factory'
   import UserRegistrationService from '../domain/services/user-registration-service'
-  const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const name = ref('')
   const email = ref('')
   const birthDate = ref('')
@@ -26,8 +25,9 @@
 
     errors.value = [...errors.value, ...user.validate()]
 
+    const usersRepository = InMemoryUsersRepository.getInstance()
     const userRegistrationService = new UserRegistrationService({
-      usersRepository: inMemoryUsersRepository,
+      usersRepository,
     })
     if (userRegistrationService.isEmailAlreadyTaken(email.value)) {
       errors.value.push('Email has already been used')
@@ -41,7 +41,7 @@
 
     if (errors.value.length === 0) {
       // persist user
-      inMemoryUsersRepository.add(user)
+      usersRepository.add(user)
 
       // send a confirmation email to the user
       sendEmail({
