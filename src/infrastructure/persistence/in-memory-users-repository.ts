@@ -1,25 +1,12 @@
+import type User from '../../domain/models/user'
+
 export default class InMemoryUsersRepository {
-  private users: Array<{
-    name: string
-    email: string
-    birthDate: string
-    encryptedPassword: string
-  }> = []
+  private users: Array<User> = []
 
   private constructor() {}
 
-  add({
-    name,
-    email,
-    birthDate,
-    encryptedPassword,
-  }: {
-    name: string
-    email: string
-    birthDate: string
-    encryptedPassword: string
-  }) {
-    this.users.push({ name, email, birthDate, encryptedPassword })
+  add(user: User) {
+    this.users.push(user)
   }
 
   deleteAll() {

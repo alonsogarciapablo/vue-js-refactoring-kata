@@ -2,6 +2,8 @@
   import { ref } from 'vue'
   import encrypt from '../utils/encrypt'
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
+  import User from '../domain/models/user'
+  import Email from '../domain/models/email'
 
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const name = ref('')
@@ -15,23 +17,16 @@
   function submit() {
     errors.value = []
 
-    if (!name.value) {
-      errors.value.push('Name cannot be blank')
-    }
-    if (email.value) {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      if (!emailRegex.test(email.value)) {
-        errors.value.push('Email is not valid')
-      }
-    } else {
-      errors.value.push('Email cannot be blank')
-    }
-    if (!birthDate.value) {
-      errors.value.push('Birthday cannot be blank')
-    }
-    if (birthDate.value && calculateAge(birthDate.value) < 18) {
-      errors.value.push('You must be older than 18')
-    }
+    const encryptedPassword = encrypt(password.value)
+    const user = new User({
+      name: name.value,
+      email: new Email(email.value),
+      birthDate: birthDate.value,
+      encryptedPassword,
+    })
+
+    errors.value = [...errors.value, ...user.validate()]
+
     if (inMemoryUsersRepository.findByEmail(email.value)) {
       errors.value.push('Email has already been used')
     }
@@ -44,12 +39,7 @@
 
     if (errors.value.length === 0) {
       // persist user
-      inMemoryUsersRepository.add({
-        name: name.value,
-        email: email.value,
-        birthDate: birthDate.value,
-        encryptedPassword: encrypt(password.value),
-      })
+      inMemoryUsersRepository.add(user)
 
       // send a confirmation email to the user
       sendEmail({
@@ -61,19 +51,6 @@
 
       isUserCreated.value = true
     }
-  }
-
-  function calculateAge(birthDate: string) {
-    const today = new Date()
-    const birth = new Date(birthDate)
-    let age = today.getFullYear() - birth.getFullYear()
-    const monthDifference = today.getMonth() - birth.getMonth()
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
-      age--
-    }
-
-    return age
   }
 
   function sendEmail({
