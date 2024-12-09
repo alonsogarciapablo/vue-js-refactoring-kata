@@ -53,6 +53,13 @@ describe('SignupView', () => {
       )
     })
 
+    it('should show an error if the email is invalid', async () => {
+      email.setValue('an invalid email')
+
+      await wrapper.get('form').trigger('submit')
+
+      expect(wrapper.get('.errors').text()).toEqual('Oooops! Check these errors:Email is not valid')
+    })
     it('should show an error if the email has already been used', async () => {
       inMemoryUsersRepository.add({
         name: 'Chuck',

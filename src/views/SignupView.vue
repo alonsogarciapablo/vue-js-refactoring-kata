@@ -18,7 +18,12 @@
     if (!name.value) {
       errors.value.push('Name cannot be blank')
     }
-    if (!email.value) {
+    if (email.value) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+      if (!emailRegex.test(email.value)) {
+        errors.value.push('Email is not valid')
+      }
+    } else {
       errors.value.push('Email cannot be blank')
     }
     if (!birthDate.value) {
