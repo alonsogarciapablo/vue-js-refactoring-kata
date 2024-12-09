@@ -3,7 +3,7 @@
   import encrypt from '../utils/encrypt'
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
   import UserFactory from '../domain/models/user-factory'
-
+  import UserRegistrationService from '../domain/services/user-registration-service'
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const name = ref('')
   const email = ref('')
@@ -26,7 +26,10 @@
 
     errors.value = [...errors.value, ...user.validate()]
 
-    if (inMemoryUsersRepository.findByEmail(email.value)) {
+    const userRegistrationService = new UserRegistrationService({
+      usersRepository: inMemoryUsersRepository,
+    })
+    if (userRegistrationService.isEmailAlreadyTaken(email.value)) {
       errors.value.push('Email has already been used')
     }
     if (password.value.length < 8) {
