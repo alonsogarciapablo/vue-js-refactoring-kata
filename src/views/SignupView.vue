@@ -2,7 +2,6 @@
   import { ref } from 'vue'
   import encrypt from '../utils/encrypt'
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
-  import LogToConsoleEmailSender from '../infrastructure/email/log-to-console-email-sender'
 
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const nameRef = ref('')
@@ -47,9 +46,8 @@
         encryptedPassword: encrypt(passwordRef.value),
       })
 
-      // send an email to confirm email
-      const emailSender = new LogToConsoleEmailSender()
-      emailSender.sendEmail({
+      // send a confirmation email to the user
+      sendEmail({
         from: 'no-reply@tinderella.com',
         to: emailRef.value,
         subject: 'Please validate your email',
@@ -71,6 +69,25 @@
     }
 
     return age
+  }
+
+  function sendEmail({
+    from,
+    to,
+    subject,
+    body,
+  }: {
+    from: string
+    to: string
+    subject: string
+    body: string
+  }): void {
+    console.log('Sending email')
+    console.log('- From: ', from)
+    console.log('- To: ', to)
+    console.log('- Subject: ', subject)
+    console.log('- Body: ', body)
+    console.log('Email sent')
   }
 </script>
 
