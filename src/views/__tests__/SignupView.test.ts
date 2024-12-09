@@ -2,8 +2,7 @@ import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
 import SignupView from '../SignupView.vue'
 import InMemoryUsersRepository from '../../infrastructure/persistence/in-memory-users-repository'
-import User from '../../domain/models/user'
-import Email from '../../domain/models/email'
+import UserFactory from '../../domain/models/user-factory'
 
 const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
 
@@ -64,9 +63,9 @@ describe('SignupView', () => {
     })
 
     it('should show an error if the email has already been used', async () => {
-      const user = new User({
+      const user = UserFactory.create({
         name: 'Chuck',
-        email: new Email('chuck@norris.com'),
+        email: 'chuck@norris.com',
         birthDate: '1981-11-12',
         encryptedPassword: '23243563',
       })
@@ -170,8 +169,8 @@ describe('SignupView', () => {
     })
 
     it('should create a user with an encripted password', async () => {
-      const user = new User({
-        email: new Email('chuck@norris.com'),
+      const user = UserFactory.create({
+        email: 'chuck@norris.com',
         name: 'Chuck',
         birthDate: '1981-11-12',
         encryptedPassword: 'MTIzNDEyMzQ=',

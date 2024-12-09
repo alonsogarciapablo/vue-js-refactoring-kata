@@ -2,8 +2,7 @@
   import { ref } from 'vue'
   import encrypt from '../utils/encrypt'
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
-  import User from '../domain/models/user'
-  import Email from '../domain/models/email'
+  import UserFactory from '../domain/models/user-factory'
 
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const name = ref('')
@@ -18,9 +17,9 @@
     errors.value = []
 
     const encryptedPassword = encrypt(password.value)
-    const user = new User({
+    const user = UserFactory.create({
       name: name.value,
-      email: new Email(email.value),
+      email: email.value,
       birthDate: birthDate.value,
       encryptedPassword,
     })
