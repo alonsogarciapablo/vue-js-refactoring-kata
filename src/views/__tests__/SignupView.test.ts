@@ -11,7 +11,13 @@ describe('SignupView', () => {
 
   beforeEach(() => {
     inMemoryUsersRepository.deleteAll()
-    wrapper = mount(SignupView)
+    wrapper = mount(SignupView, {
+      global: {
+        provide: {
+          usersRepository: InMemoryUsersRepository.getInstance(),
+        },
+      },
+    })
 
     name = wrapper.get('[data-test="name"]')
     email = wrapper.get('[data-test="email"]')
@@ -137,7 +143,13 @@ describe('SignupView', () => {
     let wrapper
 
     beforeEach(async () => {
-      wrapper = mount(SignupView)
+      wrapper = mount(SignupView, {
+        global: {
+          provide: {
+            usersRepository: InMemoryUsersRepository.getInstance(),
+          },
+        },
+      })
 
       const name = wrapper.get('[data-test="name"]')
       const email = wrapper.get('[data-test="email"]')

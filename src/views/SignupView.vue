@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { inject, ref } from 'vue'
   import encrypt from '../utils/encrypt'
-  import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
   import UserFactory from '../domain/models/user-factory'
   import UserRegistrationService from '../domain/services/user-registration-service'
+  import type UsersRepository from '../domain/repositories/users-repository'
   const name = ref('')
   const email = ref('')
   const birthDate = ref('')
@@ -12,6 +12,7 @@
   const isUserCreated = ref(false)
   const errors = ref<Array<string>>([])
 
+  const usersRepository = inject<UsersRepository>('usersRepository')
   function submit() {
     errors.value = []
 
@@ -25,7 +26,10 @@
 
     errors.value = [...errors.value, ...user.validate()]
 
-    const usersRepository = InMemoryUsersRepository.getInstance()
+    if (!usersRepository) {
+      throw new Error('usersRepository must be provided')
+    }
+
     const userRegistrationService = new UserRegistrationService({
       usersRepository,
     })
