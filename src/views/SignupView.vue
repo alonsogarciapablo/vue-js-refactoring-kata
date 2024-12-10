@@ -1,9 +1,8 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
+  import { inject, ref } from 'vue'
   import RegisterUser from '../application/use-cases/register-user'
+  import type UsersRepository from '../domain/repositories/users-repository'
 
-  const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const name = ref('')
   const email = ref('')
   const birthDate = ref('')
@@ -12,8 +11,13 @@
   const isUserCreated = ref(false)
   const errors = ref<Array<string>>([])
 
+  const userRepository = inject<UsersRepository>('usersRepository')
+
   function submit() {
-    errors.value = new RegisterUser(inMemoryUsersRepository).execute({
+    if (!userRepository) {
+      throw new Error('usersRepository must be injected')
+    }
+    errors.value = new RegisterUser(userRepository).execute({
       name: name.value,
       email: email.value,
       birthDate: birthDate.value,

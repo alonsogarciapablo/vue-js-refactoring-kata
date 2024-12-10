@@ -1,4 +1,6 @@
-export default class InMemoryUsersRepository {
+import type UsersRepository from '../../domain/repositories/users-repository'
+
+export default class InMemoryUsersRepository implements UsersRepository {
   private users: Array<{
     name: string
     email: string
