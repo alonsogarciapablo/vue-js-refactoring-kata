@@ -26,6 +26,7 @@
       if (!this.name) {
         errors.push('Name cannot be blank')
       }
+
       if (this.email) {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         if (!emailRegex.test(email.value)) {
@@ -34,7 +35,27 @@
       } else {
         errors.push('Email cannot be blank')
       }
+
+      if (!this.birthDate) {
+        errors.push('Birthday cannot be blank')
+      }
+      if (this.birthDate && this.calculateAge() < 18) {
+        errors.push('You must be older than 18')
+      }
       return errors
+    }
+
+    calculateAge() {
+      const today = new Date()
+      const birth = new Date(this.birthDate)
+      let age = today.getFullYear() - birth.getFullYear()
+      const monthDifference = today.getMonth() - birth.getMonth()
+
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
+        age--
+      }
+
+      return age
     }
   }
 
@@ -57,12 +78,6 @@
     })
     errors.value = user.validate()
 
-    if (!birthDate.value) {
-      errors.value.push('Birthday cannot be blank')
-    }
-    if (birthDate.value && calculateAge(birthDate.value) < 18) {
-      errors.value.push('You must be older than 18')
-    }
     if (inMemoryUsersRepository.findByEmail(email.value)) {
       errors.value.push('Email has already been used')
     }
@@ -87,19 +102,6 @@
 
       isUserCreated.value = true
     }
-  }
-
-  function calculateAge(birthDate: string) {
-    const today = new Date()
-    const birth = new Date(birthDate)
-    let age = today.getFullYear() - birth.getFullYear()
-    const monthDifference = today.getMonth() - birth.getMonth()
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
-      age--
-    }
-
-    return age
   }
 
   function sendEmail({
