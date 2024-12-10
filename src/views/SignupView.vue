@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import encrypt from '../utils/encrypt'
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
+  import RegisterUser from '../application/use-cases/register-user'
 
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const name = ref('')
@@ -13,89 +13,17 @@
   const errors = ref<Array<string>>([])
 
   function submit() {
-    errors.value = []
-
-    if (!name.value) {
-      errors.value.push('Name cannot be blank')
-    }
-    if (email.value) {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      if (!emailRegex.test(email.value)) {
-        errors.value.push('Email is not valid')
-      }
-    } else {
-      errors.value.push('Email cannot be blank')
-    }
-    if (!birthDate.value) {
-      errors.value.push('Birthday cannot be blank')
-    }
-    if (birthDate.value && calculateAge(birthDate.value) < 18) {
-      errors.value.push('You must be older than 18')
-    }
-    if (inMemoryUsersRepository.findByEmail(email.value)) {
-      errors.value.push('Email has already been used')
-    }
-    if (password.value.length < 8) {
-      errors.value.push('Password must have 8 digits')
-    }
-    if (password.value !== passwordConfirmation.value) {
-      errors.value.push("Passwords don't match")
-    }
+    errors.value = new RegisterUser(inMemoryUsersRepository).execute({
+      name: name.value,
+      email: email.value,
+      birthDate: birthDate.value,
+      password: password.value,
+      passwordConfirmation: passwordConfirmation.value,
+    })
 
     if (errors.value.length === 0) {
-      // persist user
-      inMemoryUsersRepository.add({
-        name: name.value,
-        email: email.value,
-        birthDate: birthDate.value,
-        encryptedPassword: encrypt(password.value),
-      })
-
-      // send a confirmation email to the user
-      const subject = 'Please validate your email'
-      const url = `https://tinderella.com/validate?email=${email.value}`
-      const body = `Click here to validate your email: <a href="${url}">validate</a>`
-      sendEmail({
-        from: 'no-reply@tinderella.com',
-        to: email.value,
-        subject: subject,
-        body: body,
-      })
-
       isUserCreated.value = true
     }
-  }
-
-  function calculateAge(birthDate: string) {
-    const today = new Date()
-    const birth = new Date(birthDate)
-    let age = today.getFullYear() - birth.getFullYear()
-    const monthDifference = today.getMonth() - birth.getMonth()
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
-      age--
-    }
-
-    return age
-  }
-
-  function sendEmail({
-    from,
-    to,
-    subject,
-    body,
-  }: {
-    from: string
-    to: string
-    subject: string
-    body: string
-  }): void {
-    console.log('Sending email')
-    console.log('- From: ', from)
-    console.log('- To: ', to)
-    console.log('- Subject: ', subject)
-    console.log('- Body: ', body)
-    console.log('Email sent')
   }
 </script>
 
