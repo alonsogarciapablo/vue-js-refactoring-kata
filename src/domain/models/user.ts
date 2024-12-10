@@ -7,6 +7,15 @@ class Email {
 
   validate(): Array<string> {
     const errors: Array<string> = []
+
+    if (this.address) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+      if (!emailRegex.test(this.address)) {
+        errors.push('Email is not valid')
+      }
+    } else {
+      errors.push('Email cannot be blank')
+    }
     return errors
   }
 }
@@ -37,15 +46,6 @@ export default class User {
 
     const email = new Email(this.email)
     errors.push(...email.validate())
-
-    if (this.email) {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      if (!emailRegex.test(this.email)) {
-        errors.push('Email is not valid')
-      }
-    } else {
-      errors.push('Email cannot be blank')
-    }
 
     if (!this.birthDate) {
       errors.push('Birthday cannot be blank')
