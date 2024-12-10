@@ -52,11 +52,14 @@
       })
 
       // send a confirmation email to the user
+      const subject = 'Please validate your email'
+      const url = `https://tinderella.com/validate?email=${email.value}`
+      const body = `Click here to validate your email: <a href="${url}">validate</a>`
       sendEmail({
         from: 'no-reply@tinderella.com',
         to: email.value,
-        subject: 'Please validate your email',
-        body: `Click here to validate your email: <a href="https://tinderella.com/validate?email=${email.value}">validate</a>`,
+        subject: subject,
+        body: body,
       })
 
       isUserCreated.value = true
