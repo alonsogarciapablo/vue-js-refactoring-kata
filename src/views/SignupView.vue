@@ -26,6 +26,14 @@
       if (!this.name) {
         errors.push('Name cannot be blank')
       }
+      if (this.email) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        if (!emailRegex.test(email.value)) {
+          errors.push('Email is not valid')
+        }
+      } else {
+        errors.push('Email cannot be blank')
+      }
       return errors
     }
   }
@@ -49,14 +57,6 @@
     })
     errors.value = user.validate()
 
-    if (email.value) {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      if (!emailRegex.test(email.value)) {
-        errors.value.push('Email is not valid')
-      }
-    } else {
-      errors.value.push('Email cannot be blank')
-    }
     if (!birthDate.value) {
       errors.value.push('Birthday cannot be blank')
     }
