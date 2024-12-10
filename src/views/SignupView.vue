@@ -13,6 +13,18 @@
   const isUserCreated = ref(false)
   const errors = ref<Array<string>>([])
 
+  class UserRegistrationService {
+    private usersRepository: InMemoryUsersRepository
+
+    constructor(usersRepository: InMemoryUsersRepository) {
+      this.usersRepository = usersRepository
+    }
+
+    isEmailTaken(email: string): boolean {
+      return !!this.usersRepository.findByEmail(email)
+    }
+  }
+
   function submit() {
     const encryptedPassword = encrypt(password.value)
     const user = new User({
@@ -23,7 +35,9 @@
     })
     errors.value = user.validate()
 
-    if (inMemoryUsersRepository.findByEmail(email.value)) {
+    const userRegistrationService = new UserRegistrationService(inMemoryUsersRepository)
+
+    if (userRegistrationService.isEmailTaken(email.value)) {
       errors.value.push('Email has already been used')
     }
     if (password.value.length < 8) {
