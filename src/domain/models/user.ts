@@ -1,8 +1,10 @@
+import Email from './email'
+
 export default class User {
   name: string
-  email: string
   birthDate: string
   encryptedPassword: string
+  emailVO: Email | undefined
 
   constructor({
     name,
@@ -16,9 +18,19 @@ export default class User {
     encryptedPassword: string
   }) {
     this.name = name
-    this.email = email
+    if (email) {
+      this.emailVO = new Email(email)
+    }
     this.birthDate = birthDate
     this.encryptedPassword = encryptedPassword
+  }
+
+  get email(): string {
+    return this.emailVO?.toString() ?? ''
+  }
+
+  set email(email: Email) {
+    this.emailVO = email
   }
 
   validate(): Array<string> {
@@ -28,9 +40,8 @@ export default class User {
       errors.push('Name cannot be blank')
     }
 
-    if (this.email) {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      if (!emailRegex.test(this.email)) {
+    if (this.emailVO) {
+      if (!this.emailVO.isValid()) {
         errors.push('Email is not valid')
       }
     } else {
