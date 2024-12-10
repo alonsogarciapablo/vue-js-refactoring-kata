@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { inject, ref } from 'vue'
   import encrypt from '../utils/encrypt'
-  import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
   import User from '../domain/models/user'
   import UserRegistrationService from '../domain/services/user-registration-service'
+  import type UsersRepository from '../domain/repositories/users-repository'
 
-  const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
+  const usersRepository = inject<UsersRepository>('usersRepository')
   const name = ref('')
   const email = ref('')
   const birthDate = ref('')
@@ -15,6 +15,10 @@
   const errors = ref<Array<string>>([])
 
   function submit() {
+    if (!usersRepository) {
+      throw new Error('usersRepository must be initialized')
+    }
+
     const encryptedPassword = encrypt(password.value)
     const user = new User({
       name: name.value,
@@ -24,7 +28,7 @@
     })
     errors.value = user.validate()
 
-    const userRegistrationService = new UserRegistrationService(inMemoryUsersRepository)
+    const userRegistrationService = new UserRegistrationService(usersRepository)
 
     if (userRegistrationService.isEmailTaken(email.value)) {
       errors.value.push('Email has already been used')
@@ -38,7 +42,7 @@
 
     if (errors.value.length === 0) {
       // persist user
-      inMemoryUsersRepository.add(user)
+      usersRepository.add(user)
 
       // send a confirmation email to the user
       sendEmail({
