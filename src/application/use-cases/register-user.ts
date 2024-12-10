@@ -1,12 +1,15 @@
 import User from '../../domain/models/user'
 import type UsersRepository from '../../domain/repositories/users-repository'
+import UserRegistrationService from '../../domain/services/user-registration-service'
 import encrypt from '../../utils/encrypt'
 
 export default class RegisterUser {
   private usersRepository: UsersRepository
+  private userRegistrationService: UserRegistrationService
 
-  constructor(usersRepository: UsersRepository) {
+  constructor(usersRepository: UsersRepository, userRegistrationService: UserRegistrationService) {
     this.usersRepository = usersRepository
+    this.userRegistrationService = userRegistrationService
   }
 
   execute({
@@ -30,7 +33,7 @@ export default class RegisterUser {
     })
     const errors = user.validate()
 
-    if (this.usersRepository.findByEmail(email)) {
+    if (this.userRegistrationService.isEmailTaken(email)) {
       errors.push('Email has already been used')
     }
     if (password.length < 8) {

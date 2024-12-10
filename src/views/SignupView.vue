@@ -2,6 +2,7 @@
   import { inject, ref } from 'vue'
   import RegisterUser from '../application/use-cases/register-user'
   import type UsersRepository from '../domain/repositories/users-repository'
+  import UserRegistrationService from '../domain/services/user-registration-service'
 
   const name = ref('')
   const email = ref('')
@@ -11,13 +12,16 @@
   const isUserCreated = ref(false)
   const errors = ref<Array<string>>([])
 
-  const userRepository = inject<UsersRepository>('usersRepository')
+  const usersRepository = inject<UsersRepository>('usersRepository')
 
   function submit() {
-    if (!userRepository) {
+    if (!usersRepository) {
       throw new Error('usersRepository must be injected')
     }
-    errors.value = new RegisterUser(userRepository).execute({
+    errors.value = new RegisterUser(
+      usersRepository,
+      new UserRegistrationService(usersRepository),
+    ).execute({
       name: name.value,
       email: email.value,
       birthDate: birthDate.value,
