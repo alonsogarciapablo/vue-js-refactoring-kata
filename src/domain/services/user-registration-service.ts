@@ -1,9 +1,9 @@
-import type InMemoryUsersRepository from '../../infrastructure/persistence/in-memory-users-repository'
+import type UsersRepository from '../repositories/users-repository'
 
 export default class UserRegistrationService {
-  private usersRepository: InMemoryUsersRepository
+  private usersRepository: UsersRepository
 
-  constructor(usersRepository: InMemoryUsersRepository) {
+  constructor(usersRepository: UsersRepository) {
     this.usersRepository = usersRepository
   }
 
