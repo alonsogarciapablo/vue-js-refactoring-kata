@@ -1,3 +1,4 @@
+import User from '../../domain/models/user'
 import type UsersRepository from '../../domain/repositories/users-repository'
 import encrypt from '../../utils/encrypt'
 
@@ -21,25 +22,14 @@ export default class RegisterUser {
     password: string
     passwordConfirmation: string
   }): Array<string> {
-    const errors = []
+    const user = new User({
+      name,
+      email,
+      birthDate,
+      encryptedPassword: encrypt(password),
+    })
+    const errors = user.validate()
 
-    if (!name) {
-      errors.push('Name cannot be blank')
-    }
-    if (email) {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      if (!emailRegex.test(email)) {
-        errors.push('Email is not valid')
-      }
-    } else {
-      errors.push('Email cannot be blank')
-    }
-    if (!birthDate) {
-      errors.push('Birthday cannot be blank')
-    }
-    if (birthDate && this.calculateAge(birthDate) < 18) {
-      errors.push('You must be older than 18')
-    }
     if (this.usersRepository.findByEmail(email)) {
       errors.push('Email has already been used')
     }
@@ -52,12 +42,7 @@ export default class RegisterUser {
 
     if (errors.length === 0) {
       // persist user
-      this.usersRepository.add({
-        name,
-        email,
-        birthDate,
-        encryptedPassword: encrypt(password),
-      })
+      this.usersRepository.add(user)
 
       // send a confirmation email to the user
       const subject = 'Please validate your email'
@@ -71,19 +56,6 @@ export default class RegisterUser {
       })
     }
     return errors
-  }
-
-  private calculateAge(birthDate: string) {
-    const today = new Date()
-    const birth = new Date(birthDate)
-    let age = today.getFullYear() - birth.getFullYear()
-    const monthDifference = today.getMonth() - birth.getMonth()
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
-      age--
-    }
-
-    return age
   }
 
   private sendEmail({

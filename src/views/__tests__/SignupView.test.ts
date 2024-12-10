@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
 import SignupView from '../SignupView.vue'
 import InMemoryUsersRepository from '../../infrastructure/persistence/in-memory-users-repository'
+import User from '../../domain/models/user'
 
 const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
 
@@ -66,13 +67,15 @@ describe('SignupView', () => {
 
       expect(wrapper.get('.errors').text()).toEqual('Oooops! Check these errors:Email is not valid')
     })
+
     it('should show an error if the email has already been used', async () => {
-      inMemoryUsersRepository.add({
+      const user = new User({
         name: 'Chuck',
         email: 'chuck@norris.com',
         birthDate: '1981-11-12',
         encryptedPassword: '23243563',
       })
+      inMemoryUsersRepository.add(user)
 
       await wrapper.get('form').trigger('submit')
 
@@ -178,12 +181,13 @@ describe('SignupView', () => {
     })
 
     it('should create a user with an encripted password', async () => {
-      expect(inMemoryUsersRepository.findByEmail('chuck@norris.com')).toEqual({
+      const user = new User({
         email: 'chuck@norris.com',
         name: 'Chuck',
         birthDate: '1981-11-12',
         encryptedPassword: 'MTIzNDEyMzQ=',
       })
+      expect(inMemoryUsersRepository.findByEmail('chuck@norris.com')).toEqual(user)
     })
   })
 })

@@ -1,24 +1,9 @@
+import type User from '../models/user'
+
 export default interface UsersRepository {
-  add: ({
-    name,
-    email,
-    birthDate,
-    encryptedPassword,
-  }: {
-    name: string
-    email: string
-    birthDate: string
-    encryptedPassword: string
-  }) => void
+  add: (user: User) => void
 
   deleteAll: () => void
 
-  findByEmail: (email: string) =>
-    | {
-        name: string
-        email: string
-        birthDate: string
-        encryptedPassword: string
-      }
-    | undefined
+  findByEmail: (email: string) => User | undefined
 }
