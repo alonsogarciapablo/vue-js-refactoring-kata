@@ -3,6 +3,25 @@
   import encrypt from '../utils/encrypt'
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
 
+  class User {
+    name: string
+    email: string
+    birthDate: string
+    encryptedPassword: string
+
+    constructor(attrs: {
+      name: string
+      email: string
+      birthDate: string
+      encryptedPassword: string
+    }) {
+      this.name = attrs.name
+      this.email = attrs.email
+      this.birthDate = attrs.birthDate
+      this.encryptedPassword = attrs.encryptedPassword
+    }
+  }
+
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const name = ref('')
   const email = ref('')
@@ -14,6 +33,14 @@
 
   function submit() {
     errors.value = []
+
+    const encryptedPassword = encrypt(password.value)
+    const user = new User({
+      name: name.value,
+      email: email.value,
+      birthDate: birthDate.value,
+      encryptedPassword: encryptedPassword,
+    })
 
     if (!name.value) {
       errors.value.push('Name cannot be blank')
@@ -44,12 +71,7 @@
 
     if (errors.value.length === 0) {
       // persist user
-      inMemoryUsersRepository.add({
-        name: name.value,
-        email: email.value,
-        birthDate: birthDate.value,
-        encryptedPassword: encrypt(password.value),
-      })
+      inMemoryUsersRepository.add(user)
 
       // send a confirmation email to the user
       sendEmail({
