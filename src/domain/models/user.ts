@@ -1,3 +1,16 @@
+class Email {
+  private address: string
+
+  constructor(address: string) {
+    this.address = address
+  }
+
+  validate(): Array<string> {
+    const errors: Array<string> = []
+    return errors
+  }
+}
+
 export default class User {
   name: string
   email: string
@@ -21,6 +34,9 @@ export default class User {
     if (!this.name) {
       errors.push('Name cannot be blank')
     }
+
+    const email = new Email(this.email)
+    errors.push(...email.validate())
 
     if (this.email) {
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
