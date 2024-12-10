@@ -1,25 +1,12 @@
+import type User from '../../domain/models/user'
+
 export default class InMemoryUsersRepository {
-  private users: Array<{
-    name: string
-    email: string
-    birthDate: string
-    encryptedPassword: string
-  }> = []
+  private users: Array<User> = []
 
   private constructor() {}
 
-  add({
-    name,
-    email,
-    birthDate,
-    encryptedPassword,
-  }: {
-    name: string
-    email: string
-    birthDate: string
-    encryptedPassword: string
-  }) {
-    this.users.push({ name, email, birthDate, encryptedPassword })
+  add(user: User) {
+    this.users.push(user)
   }
 
   deleteAll() {
@@ -27,7 +14,7 @@ export default class InMemoryUsersRepository {
   }
 
   findByEmail(email: string) {
-    return this.users.find((user: { email: string }) => user.email === email)
+    return this.users.find((user) => user.email === email)
   }
 
   private static instance: InMemoryUsersRepository
