@@ -1,12 +1,5 @@
 import type User from '../../domain/models/user'
-
-interface UsersRepository {
-  add: (user: User) => void
-
-  deleteAll: () => void
-
-  findByEmail: (email: string) => User | undefined
-}
+import type UsersRepository from '../../domain/repositories/users-repository'
 
 export default class InMemoryUsersRepository implements UsersRepository {
   private users: Array<User> = []
