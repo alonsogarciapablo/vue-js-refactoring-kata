@@ -18,4 +18,8 @@ export default class Email {
     }
     return errors
   }
+
+  toString() {
+    return this.address
+  }
 }

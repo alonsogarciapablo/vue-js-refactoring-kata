@@ -2,7 +2,7 @@ import Email from './email'
 
 export default class User {
   name: string
-  email: string
+  emailVO: Email
   birthDate: string
   encryptedPassword: string
 
@@ -13,9 +13,17 @@ export default class User {
     encryptedPassword: string
   }) {
     this.name = attrs.name
-    this.email = attrs.email
+    this.emailVO = new Email(attrs.email)
     this.birthDate = attrs.birthDate
     this.encryptedPassword = attrs.encryptedPassword
+  }
+
+  get email(): string {
+    return this.emailVO.toString()
+  }
+
+  set email(emailVO: Email) {
+    this.emailVO = emailVO
   }
 
   validate(): Array<string> {
@@ -24,8 +32,7 @@ export default class User {
       errors.push('Name cannot be blank')
     }
 
-    const email = new Email(this.email)
-    errors.push(...email.validate())
+    errors.push(...this.emailVO.validate())
 
     if (!this.birthDate) {
       errors.push('Birthday cannot be blank')
