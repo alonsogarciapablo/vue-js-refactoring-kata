@@ -20,6 +20,14 @@
       this.birthDate = attrs.birthDate
       this.encryptedPassword = attrs.encryptedPassword
     }
+
+    validate(): Array<string> {
+      const errors = []
+      if (!this.name) {
+        errors.push('Name cannot be blank')
+      }
+      return errors
+    }
   }
 
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
@@ -32,8 +40,6 @@
   const errors = ref<Array<string>>([])
 
   function submit() {
-    errors.value = []
-
     const encryptedPassword = encrypt(password.value)
     const user = new User({
       name: name.value,
@@ -41,10 +47,8 @@
       birthDate: birthDate.value,
       encryptedPassword: encryptedPassword,
     })
+    errors.value = user.validate()
 
-    if (!name.value) {
-      errors.value.push('Name cannot be blank')
-    }
     if (email.value) {
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
       if (!emailRegex.test(email.value)) {
