@@ -1,11 +1,8 @@
 <script setup lang="ts">
   import { inject, ref } from 'vue'
-  import encrypt from '../utils/encrypt'
-  import User from '../domain/models/user'
-  import UserRegistrationService from '../domain/services/user-registration-service'
   import type UsersRepository from '../domain/repositories/users-repository'
+  import RegisterUser from '../application/use-cases/register-user'
 
-  const usersRepository = inject<UsersRepository>('usersRepository')
   const name = ref('')
   const email = ref('')
   const birthDate = ref('')
@@ -13,66 +10,24 @@
   const passwordConfirmation = ref('')
   const isUserCreated = ref(false)
   const errors = ref<Array<string>>([])
+  const usersRepository = inject<UsersRepository>('usersRepository')
 
   function submit() {
     if (!usersRepository) {
       throw new Error('usersRepository must be initialized')
     }
 
-    const encryptedPassword = encrypt(password.value)
-    const user = new User({
+    const { errors: errorsFromUseCase } = new RegisterUser(usersRepository).execute({
       name: name.value,
       email: email.value,
       birthDate: birthDate.value,
-      encryptedPassword: encryptedPassword,
+      password: password.value,
+      passwordConfirmation: passwordConfirmation.value,
     })
-    errors.value = user.validate()
-
-    const userRegistrationService = new UserRegistrationService(usersRepository)
-
-    if (userRegistrationService.isEmailTaken(email.value)) {
-      errors.value.push('Email has already been used')
-    }
-    if (password.value.length < 8) {
-      errors.value.push('Password must have 8 digits')
-    }
-    if (password.value !== passwordConfirmation.value) {
-      errors.value.push("Passwords don't match")
-    }
-
+    errors.value = errorsFromUseCase
     if (errors.value.length === 0) {
-      // persist user
-      usersRepository.add(user)
-
-      // send a confirmation email to the user
-      sendEmail({
-        from: 'no-reply@tinderella.com',
-        to: email.value,
-        subject: 'Please validate your email',
-        body: `Click here to validate your email: <a href="https://tinderella.com/validate?email=${email.value}">validate</a>`,
-      })
-
       isUserCreated.value = true
     }
-  }
-
-  function sendEmail({
-    from,
-    to,
-    subject,
-    body,
-  }: {
-    from: string
-    to: string
-    subject: string
-    body: string
-  }): void {
-    console.log('Sending email')
-    console.log('- From: ', from)
-    console.log('- To: ', to)
-    console.log('- Subject: ', subject)
-    console.log('- Body: ', body)
-    console.log('Email sent')
   }
 </script>
 
