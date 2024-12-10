@@ -3,6 +3,7 @@
   import encrypt from '../utils/encrypt'
   import InMemoryUsersRepository from '../infrastructure/persistence/in-memory-users-repository'
   import User from '../domain/models/user'
+  import UserRegistrationService from '../domain/services/user-registration-service'
 
   const inMemoryUsersRepository = InMemoryUsersRepository.getInstance()
   const name = ref('')
@@ -12,18 +13,6 @@
   const passwordConfirmation = ref('')
   const isUserCreated = ref(false)
   const errors = ref<Array<string>>([])
-
-  class UserRegistrationService {
-    private usersRepository: InMemoryUsersRepository
-
-    constructor(usersRepository: InMemoryUsersRepository) {
-      this.usersRepository = usersRepository
-    }
-
-    isEmailTaken(email: string): boolean {
-      return !!this.usersRepository.findByEmail(email)
-    }
-  }
 
   function submit() {
     const encryptedPassword = encrypt(password.value)
