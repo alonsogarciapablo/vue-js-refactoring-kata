@@ -16,4 +16,15 @@ export default [
   ...pluginVue.configs['flat/essential'],
   ...vueTsEslintConfig(),
   skipFormatting,
+  {
+    rules: {
+      'no-use-before-define': [
+        'error',
+        {
+          variables: true,
+          functions: false,
+        },
+      ],
+    },
+  },
 ]
